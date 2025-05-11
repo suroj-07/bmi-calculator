@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Calorie Needs Calculator</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.0.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f4f8;
+            color: #2d3748;
+        }
+        
+        .container {
+            max-width: 800px;
+        }
+        
+        .calc-card {
+            border-radius: 15px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        
+        .calorie-gauge {
+            height: 20px;
+            border-radius: 10px;
+            background: linear-gradient(90deg, #4c1d95 0%, #8b5cf6 25%, #60a5fa 50%, #34d399 75%, #fcd34d 100%);
+            position: relative;
+        }
+        
+        .calorie-pointer {
+            position: absolute;
+            bottom: 100%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-top: 12px solid #2563eb;
+        }
+        
+        .ad-container {
+            background-color: #e5e7eb;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: center;
+            min-height: 90px;
+        }
+        
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+        
+        .result-card {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+        }
+        
+        .result-card.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .pie-chart {
+            width: 200px;
+            height: 200px;
+            position: relative;
+            margin: 0 auto;
+        }
+        
+        .pie-segment {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            clip: rect(0px, 200px, 200px, 100px);
+            border-radius: 50%;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            margin-right: 8px;
+            border-radius: 4px;
+        }
+        
+        #loading {
+            display: none;
+        }
+        
+        .activity-option {
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .activity-option:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="py-8">
+    <div class="container mx-auto px-4">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-indigo-700 mb-2">Daily Calorie Needs Calculator</h1>
+            <p class="text-gray-600">Calculate how many calories you need based on your personal metrics and activity level</p>
+        </header>
+        
+        <!-- Top Ad Space -->
+        <div class="ad-container mb-6">
+            <div class="text-gray-400">
+                <!-- Google AdSense -->
+                <p class="text-sm">ADVERTISEMENT</p>
+                <!-- Ad Unit Code Here -->
+                <div class="h-14 flex items-center justify-center">
+                    <span class="text-sm">Google AdSense Ad Unit</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flex flex-col md:flex-row gap-6">
+            <div class="w-full md:w-1/2">
+                <!-- Calculator Form -->
+                <div class="calc-card bg-white p-6 mb-6">
+                    <h2 class="text-xl font-bold mb-4 flex items-center">
+                        <i class="fas fa-calculator mr-2 text-indigo-600"></i>
+                        Personal Information
+                    </h2>
+                    <form id="calorieForm" class="space-y-4">
+                        <!-- Gender Selection -->
+                        <div class="mb-4">
+                            <label class="block mb-2 text-sm font-medium">Gender</label>
+                            <div class="flex space-x-4">
+                                <label class="flex items-center p-3 border rounded-lg cursor-pointer transition-colors hover:bg-indigo-50 gender-option">
+                                    <input type="radio" name="gender" value="male" checked class="hidden">
+                                    <div class="radio-btn w-5 h-5 border-2 border-indigo-600 rounded-full flex items-center justify-center mr-2">
+                                        <div class="inner-circle w-3 h-3 rounded-full bg-indigo-600 opacity-0 transition-opacity"></div>
+                                    </div>
+                                    <span>Male</span>
+                                </label>
+                                <label class="flex items-center p-3 border rounded-lg cursor-pointer transition-colors hover:bg-indigo-50 gender-option">
+                                    <input type="radio" name="gender" value="female" class="hidden">
+                                    <div class="radio-btn w-5 h-5 border-2 border-indigo-600 rounded-full flex items-center justify-center mr-2">
+                                        <div class="inner-circle w-3 h-3 rounded-full bg-indigo-600 opacity-0 transition-opacity"></div>
+                                    </div>
+                                    <span>Female</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Age -->
+                        <div class="mb-4">
+                            <label for="age" class="block mb-2 text-sm font-medium">Age</label>
+                            <div class="flex items-center relative">
+                                <input type="number" id="age" name="age" min="15" max="80" value="30" class="block w-full p-3 rounded-lg border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500">
+                                <div class="absolute right-3 text-gray-400">years</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Height -->
+                        <div class="mb-4">
+                            <label class="block mb-2 text-sm font-medium">Height</label>
+                            <div class="flex space-x-2">
+                                <div class="relative w-1/2">
+                                    <input type="number" id="heightFeet" min="4" max="7" value="5" class="block w-full p-3 rounded-lg border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500">
+                                    <div class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400">ft</div>
+                                </div>
+                                <div class="relative w-1/2">
+                                    <input type="number" id="heightInches" min="0" max="11" value="10" class="block w-full p-3 rounded-lg border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500">
+                                    <div class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400">in</div>
+                                </div>
+                            </div>
+                            <div class="mt-2 flex items-center">
+                                <input type="number" id="heightCm" min="140" max="220" value="178" class="block w-full p-3 rounded-lg border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500">
+                                <div class="absolute right-6 text-gray-400">cm</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Weight -->
+                        <div class="mb-4">
+                            <label class="block mb-2 text-sm font-medium">Weight</label>
+                            <div class="flex space-x-2">
+                                <div class="relative w-1/2">
+                                    <input type="number" id="weightLbs" min="80" max="400" value="160" class="block w-full p-3 rounded-lg border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500">
+                                    <div class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400">lbs</div>
+                                </div>
+                                <div class="relative w-1/2">
+                                    <input type="number" id="weightKg" min="36" max="180" value="72.5" class="block w-full p-3 rounded-lg border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500">
+                                    <div class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400">kg</div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Activity Level -->
+                <div class="calc-card bg-white p-6">
+                    <h2 class="text-xl font-bold mb-4 flex items-center">
+                        <i class="fas fa-running mr-2 text-indigo-600"></i>
+                        Activity Level
+                    </h2>
+                    <div class="space-y-3" id="activityOptions">
+                        <div class="activity-option p-3 border rounded-lg" data-value="1.2">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <h3 class="font-medium">Sedentary</h3>
+                                    <p class="text-sm text-gray-600">Little or no exercise</p>
+                                </div>
+                                <div class="w-4 h-4 rounded-full border-2 border-indigo-600 flex items-center justify-center">
+                                    <div class="activity-check w-2 h-2 rounded-full bg-indigo-600 hidden"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="activity-option p-3 border rounded-lg" data-value="1.375">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <h3 class="font-medium">Lightly Active</h3>
+                                    <p class="text-sm text-gray-600">Light exercise 1-3 days/week</p>
+                                </div>
+                                <div class="w-4 h-4 rounded-full border-2 border-indigo-600 flex items-center justify-center">
+                                    <div class="activity-check w-2 h-2 rounded-full bg-indigo-600 hidden"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="activity-option p-3 border rounded-lg" data-value="1.55">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <h3 class="font-medium">Moderately Active</h3>
+                                    <p class="text-sm text-gray-600">Moderate exercise 3-5 days/week</p>
+                                </div>
+                                <div class="w-4 h-4 rounded-full border-2 border-indigo-600 flex items-center justify-center">
+                                    <div class="activity-check w-2 h-2 rounded-full bg-indigo-600 hidden"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="activity-option p-3 border rounded-lg" data-value="1.725">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <h3 class="font-medium">Very Active</h3>
+                                    <p class="text-sm text-gray-600">Hard exercise 6-7 days/week</p>
+                                </div>
+                                <div class="w-4 h-4 rounded-full border-2 border-indigo-600 flex items-center justify-center">
+                                    <div class="activity-check w-2 h-2 rounded-full bg-indigo-600 hidden"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="activity-option p-3 border rounded-lg" data-value="1.9">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <h3 class="font-medium">Extremely Active</h3>
+                                    <p class="text-sm text-gray-600">Very hard exercise & physical job</p>
+                                </div>
+                                <div class="w-4 h-4 rounded-full border-2 border-indigo-600 flex items-center justify-center">
+                                    <div class="activity-check w-2 h-2 rounded-full bg-indigo-600 hidden"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Calculate Button -->
+                    <div class="mt-6">
+                        <button id="calculateBtn" class="w-full py-3 px-6 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors flex items-center justify-center">
+                            <span id="btnText">Calculate Calories</span>
+                            <div id="loading" class="ml-2">
+                                <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                                </svg>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="w-full md:w-1/2">
+                <!-- Results Section (initially hidden) -->
+                <div id="resultsSection" class="result-card calc-card bg-white p-6">
+                    <h2 class="text-xl font-bold mb-4 flex items-center">
+                        <i class="fas fa-chart-pie mr-2 text-indigo-600"></i>
+                        Your Calorie Results
+                    </h2>
+                    
+                    <div class="mb-5">
+                        <div class="flex justify-between text-sm text-gray-600 mb-1">
+                            <span>1500</span>
+                            <span>3000</span>
+                        </div>
+                        <div class="calorie-gauge mb-5 relative">
+                            <div id="caloriePointer" class="calorie-pointer" style="left: 50%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-6 p-4 bg-indigo-50 rounded-lg">
+                        <h3 class="text-lg font-semibold text-indigo-700 mb-1">Maintenance Calories</h3>
+                        <div class="flex items-center">
+                            <span id="maintenanceCalories" class="text-3xl font-bold text-indigo-800">2,250</span>
+                            <span class="ml-2 text-gray-600">calories/day</span>
+                        </div>
+                        <p class="text-sm text-gray-600 mt-1">This is the amount of calories you need to maintain your current weight.</p>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4 mb-6">
+                        <div class="p-3 bg-green-50 rounded-lg">
+                            <h3 class="text-sm font-semibold text-green-700">Weight Loss</h3>
+                            <div class="mt-1">
+                                <div class="flex items-center">
+                                    <span id="weightLossCalories" class="text-xl font-bold text-green-800">1,750</span>
+                                    <span class="ml-1 text-xs text-gray-600">cal/day</span>
+                                </div>
+                                <p class="text-xs text-gray-600">500 calorie deficit</p>
+                            </div>
+                        </div>
+                        
+                        <div class="p-3 bg-blue-50 rounded-lg">
+                            <h3 class="text-sm font-semibold text-blue-700">Weight Gain</h3>
+                            <div class="mt-1">
+                                <div class="flex items-center">
+                                    <span id="weightGainCalories" class="text-xl font-bold text-blue-800">2,750</span>
+                                    <span class="ml-1 text-xs text-gray-600">cal/day</span>
+                                </div>
+                                <p class="text-xs text-gray-600">500 calorie surplus</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h3 class="text-lg font-semibold mb-4">Macronutrient Breakdown</h3>
+                    
+                    <div class="flex flex-col md:flex-row items-center mb-6">
+                        <div class="pie-chart mb-4 md:mb-0">
+                            <div class="pie-segment" id="proteinSegment" style="background-color: #4f46e5; transform: rotate(0deg);"></div>
+                            <div class="pie-segment" id="carbsSegment" style="background-color: #10b981; transform: rotate(115.2deg);"></div>
+                            <div class="pie-segment" id="fatSegment" style="background-color: #f59e0b; transform: rotate(259.2deg);"></div>
+                        </div>
+                        
+                        <div class="ml-0 md:ml-6">
+                            <div class="legend-item">
+                                <div class="legend-color" style="background-color: #4f46e5;"></div>
+                                <div>
+                                    <div class="font-medium">Protein</div>
+                                    <div class="text-sm text-gray-600"><span id="proteinGrams">141</span>g (<span id="proteinPercent">25</span>%)</div>
+                                </div>
+                            </div>
+                            
+                            <div class="legend-item">
+                                <div class="legend-color" style="background-color: #10b981;"></div>
+                                <div>
+                                    <div class="font-medium">Carbs</div>
+                                    <div class="text-sm text-gray-600"><span id="carbsGrams">281</span>g (<span id="carbsPercent">50</span>%)</div>
+                                </div>
+                            </div>
+                            
+                            <div class="legend-item">
+                                <div class="legend-color" style="background-color: #f59e0b;"></div>
+                                <div>
+                                    <div class="font-medium">Fat</div>
+                                    <div class="text-sm text-gray-600"><span id="fatGrams">63</span>g (<span id="fatPercent">25</span>%)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-sm text-gray-600">
+                        <p class="mb-2">• These calculations are based on the Mifflin-St Jeor equation</p>
+                        <p>• Macronutrient distribution follows general recommendations for a balanced diet</p>
+                    </div>
+                </div>
+                
+                <!-- Side Ad Space -->
+                <div class="ad-container mt-6">
+                    <div class="text-gray-400">
+                        <!-- Google AdSense -->
+                        <p class="text-sm">ADVERTISEMENT</p>
+                        <!-- Ad Unit Code Here -->
+                        <div class="h-60 flex items-center justify-center">
+                            <span class="text-sm">Google AdSense Ad Unit</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Bottom Ad Space -->
+        <div class="ad-container mt-8">
+            <div class="text-gray-400">
+                <!-- Google AdSense -->
+                <p class="text-sm">ADVERTISEMENT</p>
+                <!-- Ad Unit Code Here -->
+                <div class="h-20 flex items-center justify-center">
+                    <span class="text-sm">Google AdSense Ad Unit</span>
+                </div>
+            </div>
+        </div>
+        
+        <footer class="mt-8 text-center text-gray-600 text-sm">
+            <p>© 2023 Daily Calorie Calculator. All rights reserved.</p>
+            <p class="mt-1">This calculator provides estimates and should not be considered medical advice.</p>
+            <p class="mt-1">Consult with a healthcare professional for personalized nutrition guidance.</p>
+        </footer>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Gender selection
+            const genderOptions = document.querySelectorAll('.gender-option');
+            
+            genderOptions.forEach(option => {
+                const radio = option.querySelector('input[type="radio"]');
+                const innerCircle = option.querySelector('.inner-circle');
+                
+                // Set initial state
+                if (radio.checked) {
+                    innerCircle.classList.add('opacity-100');
+                    option.classList.add('bg-indigo-50', 'border-indigo-300');
+                }
+                
+                option.addEventListener('click', () => {
+                    // Reset all options
+                    genderOptions.forEach(opt => {
+                        opt.classList.remove('bg-indigo-50', 'border-indigo-300');
+                        opt.querySelector('.inner-circle').classList.remove('opacity-100');
+                        opt.querySelector('input[type="radio"]').checked = false;
+                    });
+                    
+                    // Set selected option
+                    radio.checked = true;
+                    innerCircle.classList.add('opacity-100');
+                    option.classList.add('bg-indigo-50', 'border-indigo-300');
+                });
+            });
+            
+            // Activity level selection
+            const activityOptions = document.querySelectorAll('.activity-option');
+            let selectedActivity = null;
+            
+            activityOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    // Reset all options
+                    activityOptions.forEach(opt => {
+                        opt.classList.remove('bg-indigo-50', 'border-indigo-300');
+                        opt.querySelector('.activity-check').classList.add('hidden');
+                    });
+                    
+                    // Set selected option
+                    option.classList.add('bg-indigo-50', 'border-indigo-300');
+                    option.querySelector('.activity-check').classList.remove('hidden');
+                    selectedActivity = option.dataset.value;
+                });
+            });
+            
+            // Set default activity level
+            const defaultActivity = document.querySelector('.activity-option[data-value="1.55"]');
+            defaultActivity.click();
+            
+            // Height conversion
+            const heightFeet = document.getElementById('heightFeet');
+            const heightInches = document.getElementById('heightInches');
+            const heightCm = document.getElementById('heightCm');
+            
+            function updateHeightCm() {
+                const feet = parseInt(heightFeet.value) || 0;
+                const inches = parseInt(heightInches.value) || 0;
+                const totalInches = feet * 12 + inches;
+                heightCm.value = Math.round(totalInches * 2.54);
+            }
+            
+            function updateHeightFeetInches() {
+                const cm = parseInt(heightCm.value) || 0;
+                const totalInches = cm / 2.54;
+                const feet = Math.floor(totalInches / 12);
+                const inches = Math.round(totalInches % 12);
+                
+                heightFeet.value = feet;
+                heightInches.value = inches;
+            }
+            
+            heightFeet.addEventListener('input', updateHeightCm);
+            heightInches.addEventListener('input', updateHeightCm);
+            heightCm.addEventListener('input', updateHeightFeetInches);
+            
+            // Weight conversion
+            const weightLbs = document.getElementById('weightLbs');
+            const weightKg = document.getElementById('weightKg');
+            
+            function updateWeightKg() {
+                const lbs = parseFloat(weightLbs.value) || 0;
+                weightKg.value = (lbs / 2.20462).toFixed(1);
+            }
+            
+            function updateWeightLbs() {
+                const kg = parseFloat(weightKg.value) || 0;
+                weightLbs.value = Math.round(kg * 2.20462);
+            }
+            
+            weightLbs.addEventListener('input', updateWeightKg);
+            weightKg.addEventListener('input', updateWeightLbs);
+            
+            // Calculate button
+            const calculateBtn = document.getElementById('calculateBtn');
+            const resultsSection = document.getElementById('resultsSection');
+            const loading = document.getElementById('loading');
+            const btnText = document.getElementById('btnText');
+            
+            calculateBtn.addEventListener('click', function() {
+                // Show loading state
+                loading.style.display = 'block';
+                btnText.textContent = 'Calculating...';
+                
+                // Simulate calculation delay (remove in production)
+                setTimeout(function() {
+                    calculateCalories();
+                    
+                    // Hide loading state
+                    loading.style.display = 'none';
+                    btnText.textContent = 'Calculate Calories';
+                    
+                    // Show results
+                    resultsSection.classList.add('show');
+                    
+                    // Scroll to results on mobile
+                    if (window.innerWidth < 768) {
+                        resultsSection.scrollIntoView({behavior: 'smooth'});
+                    }
+                }, 800);
+            });
+            
+            function calculateCalories() {
+                // Get user input
+                const gender = document.querySelector('input[name="gender"]:checked').value;
+                const age = parseInt(document.getElementById('age').value);
+                const weight = parseFloat(document.getElementById('weightKg').value);
+                const height = parseInt(document.getElementById('heightCm').value);
+                const activityLevel = parseFloat(selectedActivity);
+                
+                // Calculate BMR using Mifflin-St Jeor Equation
+                let bmr;
+                if (gender === 'male') {
+                    bmr = 10 * weight + 6.25 * height - 5 * age + 5;
+                } else {
+                    bmr = 10 * weight + 6.25 * height - 5 * age - 161;
+                }
+                
+                // Calculate TDEE (Total Daily Energy Expenditure)
+                const maintenanceCalories = Math.round(bmr * activityLevel);
+                const weightLossCalories = Math.round(maintenanceCalories - 500);
+                const weightGainCalories = Math.round(maintenanceCalories + 500);
+                
+                // Update results
+                document.getElementById('maintenanceCalories').textContent = maintenanceCalories.toLocaleString();
+                document.getElementById('weightLossCalories').textContent = weightLossCalories.toLocaleString();
+                document.getElementById('weightGainCalories').textContent = weightGainCalories.toLocaleString();
+                
+                // Update calorie gauge pointer
+                const pointerPosition = Math.min(Math.max((maintenanceCalories - 1500) / 1500 * 100, 0), 100);
+                document.getElementById('caloriePointer').style.left = `${pointerPosition}%`;
+                
+                // Calculate macronutrients (based on maintenance calories)
+                const proteinPercent = 25;
+                const carbsPercent = 50;
+                const fatPercent = 25;
+                
+                const proteinCalories = maintenanceCalories * (proteinPercent / 100);
+                const carbsCalories = maintenanceCalories * (carbsPercent / 100);
+                const fatCalories = maintenanceCalories * (fatPercent / 100);
+                
+                const proteinGrams = Math.round(proteinCalories / 4); // 4 calories per gram of protein
+                const carbsGrams = Math.round(carbsCalories / 4);     // 4 calories per gram of carbs
+                const fatGrams = Math.round(fatCalories / 9);         // 9 calories per gram of fat
+                
+                // Update macronutrients in the UI
+                document.getElementById('proteinGrams').textContent = proteinGrams;
+                document.getElementById('carbsGrams').textContent = carbsGrams;
+                document.getElementById('fatGrams').textContent = fatGrams;
+                document.getElementById('proteinPercent').textContent = proteinPercent;
+                document.getElementById('carbsPercent').textContent = carbsPercent;
+                document.getElementById('fatPercent').textContent = fatPercent;
+                
+                // Update pie chart segments
+                const proteinDegrees = 3.6 * proteinPercent;
+                const carbsDegrees = 3.6 * carbsPercent;
+                
+                document.getElementById('proteinSegment').style.transform = `rotate(0deg)`;
+                document.getElementById('carbsSegment').style.transform = `rotate(${proteinDegrees}deg)`;
+                document.getElementById('fatSegment').style.transform = `rotate(${proteinDegrees + carbsDegrees}deg)`;
+            }
+        });
+    </script>
+</body>
+</html>
