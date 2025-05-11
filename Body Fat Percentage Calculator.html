@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Body Fat Percentage Calculator</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.1/css/all.min.css">
+    <style>
+        body {
+            background-color: #f5f7fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .container {
+            max-width: 800px;
+        }
+        
+        .card {
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        input[type="number"], select {
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            padding: 0.5rem 1rem;
+            width: 100%;
+        }
+        
+        .btn {
+            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
+        }
+        
+        .gauge {
+            position: relative;
+            width: 100%;
+            height: 160px;
+            margin: 0 auto;
+        }
+        
+        .gauge-container {
+            position: relative;
+            height: 120px;
+            overflow: hidden;
+            text-align: center;
+        }
+        
+        .gauge-bg {
+            width: 100%;
+            height: 120px;
+            background: linear-gradient(to right, 
+                #3498db 0%, /* Essential fat */
+                #2ecc71 15%, /* Athletic */
+                #27ae60 30%, /* Fitness */
+                #f1c40f 45%, /* Acceptable */
+                #e67e22 60%, /* Overweight */
+                #e74c3c 80% /* Obese */
+            );
+            border-radius: 120px 120px 0 0;
+        }
+        
+        .gauge-needle {
+            position: absolute;
+            width: 3px;
+            height: 110px;
+            background-color: #2c3e50;
+            top: 10px;
+            left: 50%;
+            transform-origin: bottom center;
+            transform: rotate(0deg);
+            transition: transform 1s ease-in-out;
+            z-index: 10;
+        }
+        
+        .gauge-needle::after {
+            content: "";
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #2c3e50;
+            border-radius: 50%;
+            bottom: -5px;
+            left: -3.5px;
+        }
+        
+        .gauge-label {
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            bottom: 20px;
+        }
+        
+        .gauge-categories {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            font-size: 0.75rem;
+            color: #555;
+        }
+        
+        .ad-container {
+            background-color: #f1f5f9;
+            border: 1px dashed #cbd5e1;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+            color: #64748b;
+        }
+        
+        /* Gender selector */
+        .gender-selector {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .gender-option {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .gender-option.selected {
+            border-color: #3b82f6;
+            background-color: rgba(59, 130, 246, 0.1);
+        }
+        
+        .gender-icon {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        
+        /* Body fat categories display */
+        .category-indicator {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+            vertical-align: middle;
+        }
+        
+        .body-fat-table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+        
+        .body-fat-table th, .body-fat-table td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .body-fat-table th {
+            background-color: #f8fafc;
+        }
+        
+        /* Results animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+    </style>
+</head>
+<body class="py-8">
+    <div class="container mx-auto px-4">
+        <!-- Top Ad Space -->
+        <div class="ad-container mb-6">
+            <p class="text-sm">Google AdSense</p>
+            <p>Ad Unit ID: ca-pub-xxxxxxxxxxxxxxxx</p>
+            <p class="text-xs mt-2">Top Banner Ad (728x90)</p>
+        </div>
+        
+        <div class="card bg-white p-6 mb-6">
+            <h1 class="text-3xl font-bold text-center mb-6">Body Fat Percentage Calculator</h1>
+            <p class="text-gray-600 text-center mb-8">Calculate your body fat percentage based on your measurements</p>
+            
+            <div class="mb-6">
+                <label class="block text-gray-700 font-medium mb-2">Gender</label>
+                <div class="gender-selector">
+                    <div class="gender-option selected" id="male-option" onclick="selectGender('male')">
+                        <div class="gender-icon text-blue-500"><i class="fas fa-mars"></i></div>
+                        <div>Male</div>
+                    </div>
+                    <div class="gender-option" id="female-option" onclick="selectGender('female')">
+                        <div class="gender-icon text-pink-500"><i class="fas fa-venus"></i></div>
+                        <div>Female</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div>
+                    <label for="age" class="block text-gray-700 font-medium mb-2">Age (years)</label>
+                    <input type="number" id="age" min="18" max="100" value="30" class="bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                
+                <div>
+                    <label for="height" class="block text-gray-700 font-medium mb-2">Height (cm)</label>
+                    <input type="number" id="height" min="100" max="250" value="170" class="bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                
+                <div>
+                    <label for="weight" class="block text-gray-700 font-medium mb-2">Weight (kg)</label>
+                    <input type="number" id="weight" min="30" max="300" value="70" class="bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                
+                <div>
+                    <label for="neck" class="block text-gray-700 font-medium mb-2">Neck Circumference (cm)</label>
+                    <input type="number" id="neck" min="20" max="80" value="35" class="bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                
+                <div>
+                    <label for="waist" class="block text-gray-700 font-medium mb-2">Waist Circumference (cm)</label>
+                    <input type="number" id="waist" min="40" max="200" value="85" class="bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                
+                <div id="hip-container">
+                    <label for="hip" class="block text-gray-700 font-medium mb-2">Hip Circumference (cm)</label>
+                    <input type="number" id="hip" min="40" max="200" value="95" class="bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500" disabled>
+                </div>
+            </div>
+            
+            <div class="text-center">
+                <button id="calculate-btn" class="btn bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors" onclick="calculateBodyFat()">Calculate Body Fat</button>
+            </div>
+        </div>
+        
+        <!-- Middle Ad Space -->
+        <div class="ad-container mb-6">
+            <p class="text-sm">Google AdSense</p>
+            <p>Ad Unit ID: ca-pub-xxxxxxxxxxxxxxxx</p>
+            <p class="text-xs mt-2">In-Content Ad (300x250)</p>
+        </div>
+        
+        <!-- Results Section - Initially Hidden -->
+        <div id="results" class="card bg-white p-6 mb-6 hidden">
+            <h2 class="text-2xl font-bold text-center mb-4">Your Results</h2>
+            
+            <!-- Gauge Display -->
+            <div class="gauge">
+                <div class="gauge-container">
+                    <div class="gauge-bg"></div>
+                    <div class="gauge-needle" id="needle"></div>
+                </div>
+                <div class="gauge-label" id="result-value">0%</div>
+            </div>
+            
+            <div class="gauge-categories">
+                <span>Essential</span>
+                <span>Athletic</span>
+                <span>Fitness</span>
+                <span>Average</span>
+                <span>Obese</span>
+            </div>
+            
+            <div id="result-category" class="text-center text-xl font-medium my-4">Your body fat category</div>
+            
+            <div id="result-message" class="text-gray-700 text-center mb-6">
+                <!-- Dynamic message will be inserted here -->
+            </div>
+            
+            <!-- Body Fat Categories Table -->
+            <h3 class="text-lg font-semibold mt-6 mb-2">Body Fat Categories</h3>
+            <div class="overflow-x-auto">
+                <table class="body-fat-table">
+                    <thead>
+                        <tr>
+                            <th>Category</th>
+                            <th>Men</th>
+                            <th>Women</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div class="category-indicator" style="background-color: #3498db;"></div>
+                                Essential Fat
+                            </td>
+                            <td>2-5%</td>
+                            <td>10-13%</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="category-indicator" style="background-color: #2ecc71;"></div>
+                                Athletes
+                            </td>
+                            <td>6-13%</td>
+                            <td>14-20%</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="category-indicator" style="background-color: #27ae60;"></div>
+                                Fitness
+                            </td>
+                            <td>14-17%</td>
+                            <td>21-24%</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="category-indicator" style="background-color: #f1c40f;"></div>
+                                Average
+                            </td>
+                            <td>18-24%</td>
+                            <td>25-31%</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="category-indicator" style="background-color: #e67e22;"></div>
+                                Overweight
+                            </td>
+                            <td>25-30%</td>
+                            <td>32-38%</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="category-indicator" style="background-color: #e74c3c;"></div>
+                                Obese
+                            </td>
+                            <td>31%+</td>
+                            <td>39%+</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Bottom Ad Space -->
+        <div class="ad-container">
+            <p class="text-sm">Google AdSense</p>
+            <p>Ad Unit ID: ca-pub-xxxxxxxxxxxxxxxx</p>
+            <p class="text-xs mt-2">Bottom Banner Ad (728x90)</p>
+        </div>
+        
+        <footer class="text-center text-gray-500 text-sm mt-8 mb-4">
+            <p>This calculator uses the U.S. Navy method for estimating body fat percentage.</p>
+            <p>Results are for informational purposes only. Consult with a healthcare professional for medical advice.</p>
+            <p class="mt-2">&copy; 2023 Body Fat Percentage Calculator. All rights reserved.</p>
+        </footer>
+    </div>
+    
+    <script>
+        // Global variables
+        let selectedGender = 'male';
+        
+        // Initialization
+        document.addEventListener('DOMContentLoaded', function() {
+            // Hide hip measurement for males by default
+            document.getElementById('hip-container').style.display = 'none';
+        });
+        
+        function selectGender(gender) {
+            selectedGender = gender;
+            
+            // Toggle selected class
+            document.getElementById('male-option').classList.toggle('selected', gender === 'male');
+            document.getElementById('female-option').classList.toggle('selected', gender === 'female');
+            
+            // Show/hide hip measurement based on gender
+            const hipContainer = document.getElementById('hip-container');
+            const hipInput = document.getElementById('hip');
+            
+            if (gender === 'male') {
+                hipContainer.style.display = 'none';
+                hipInput.disabled = true;
+            } else {
+                hipContainer.style.display = 'block';
+                hipInput.disabled = false;
+            }
+        }
+        
+        function calculateBodyFat() {
+            // Get input values
+            const age = parseFloat(document.getElementById('age').value);
+            const height = parseFloat(document.getElementById('height').value);
+            const weight = parseFloat(document.getElementById('weight').value);
+            const neck = parseFloat(document.getElementById('neck').value);
+            const waist = parseFloat(document.getElementById('waist').value);
+            const hip = parseFloat(document.getElementById('hip').value || 0);
+            
+            // Validate inputs
+            if (!validateInputs(age, height, weight, neck, waist, hip)) {
+                return;
+            }
+            
+            let bodyFatPercentage;
+            
+            // Calculate body fat using Navy method
+            if (selectedGender === 'male') {
+                bodyFatPercentage = 86.010 * Math.log10(waist - neck) - 70.041 * Math.log10(height) + 36.76;
+            } else {
+                bodyFatPercentage = 163.205 * Math.log10(waist + hip - neck) - 97.684 * Math.log10(height) - 104.912;
+            }
+            
+            // Ensure the result is within reasonable bounds
+            bodyFatPercentage = Math.max(2, Math.min(bodyFatPercentage, 60));
+            
+            // Display results
+            showResults(bodyFatPercentage);
+        }
+        
+        function validateInputs(age, height, weight, neck, waist, hip) {
+            if (isNaN(age) || age < 18 || age > 100) {
+                alert('Please enter a valid age between 18 and 100');
+                return false;
+            }
+            
+            if (isNaN(height) || height < 100 || height > 250) {
+                alert('Please enter a valid height between 100 and 250 cm');
+                return false;
+            }
+            
+            if (isNaN(weight) || weight < 30 || weight > 300) {
+                alert('Please enter a valid weight between 30 and 300 kg');
+                return false;
+            }
+            
+            if (isNaN(neck) || neck < 20 || neck > 80) {
+                alert('Please enter a valid neck circumference between 20 and 80 cm');
+                return false;
+            }
+            
+            if (isNaN(waist) || waist < 40 || waist > 200) {
+                alert('Please enter a valid waist circumference between 40 and 200 cm');
+                return false;
+            }
+            
+            if (selectedGender === 'female' && (isNaN(hip) || hip < 40 || hip > 200)) {
+                alert('Please enter a valid hip circumference between 40 and 200 cm');
+                return false;
+            }
+            
+            return true;
+        }
+        
+        function showResults(bodyFatPercentage) {
+            // Show results section
+            const resultsSection = document.getElementById('results');
+            resultsSection.classList.remove('hidden');
+            resultsSection.classList.add('fade-in');
+            
+            // Scroll to results
+            resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            
+            // Round to 1 decimal place
+            const roundedBFP = Math.round(bodyFatPercentage * 10) / 10;
+            
+            // Update the result value display
+            document.getElementById('result-value').textContent = roundedBFP + '%';
+            
+            // Calculate needle position (0-180 degrees)
+            // Map the body fat percentage to a degree value for the needle
+            // For men: 2-35% maps to 0-180 degrees
+            // For women: 10-45% maps to 0-180 degrees
+            let minBF, maxBF;
+            if (selectedGender === 'male') {
+                minBF = 2;
+                maxBF = 35;
+            } else {
+                minBF = 10;
+                maxBF = 45;
+            }
+            
+            // Clamp the body fat percentage within range
+            const clampedBFP = Math.max(minBF, Math.min(roundedBFP, maxBF));
+            
+            // Map to degrees
+            const degrees = ((clampedBFP - minBF) / (maxBF - minBF)) * 180;
+            
+            // Update needle position
+            document.getElementById('needle').style.transform = `rotate(${degrees}deg)`;
+            
+            // Determine category and message
+            const category = getBodyFatCategory(roundedBFP, selectedGender);
+            document.getElementById('result-category').textContent = category.name;
+            
+            // Set color based on category
+            document.getElementById('result-category').style.color = category.color;
+            
+            // Set descriptive message
+            document.getElementById('result-message').innerHTML = `
+                <p class="mb-2">Your body fat percentage is <strong>${roundedBFP}%</strong>, which falls into the <strong>${category.name}</strong> category.</p>
+                <p>${category.message}</p>
+            `;
+        }
+        
+        function getBodyFatCategory(bodyFatPercentage, gender) {
+            // Define categories for men and women
+            const categories = {
+                male: [
+                    { max: 5, name: 'Essential Fat', color: '#3498db', message: 'This is the minimum level of fat needed for basic physiological functions.' },
+                    { max: 13, name: 'Athletic', color: '#2ecc71', message: 'This level is typically seen in athletes and those who maintain intense physical training regimens.' },
+                    { max: 17, name: 'Fitness', color: '#27ae60', message: 'This range indicates good fitness and is achievable with consistent exercise and proper nutrition.' },
+                    { max: 24, name: 'Average', color: '#f1c40f', message: 'This is the typical range for many men. Moderate regular exercise and a balanced diet can help improve this level.' },
+                    { max: 30, name: 'Overweight', color: '#e67e22', message: 'This range indicates excess fat that may pose health risks. Consider increasing activity and adjusting diet.' },
+                    { max: 100, name: 'Obese', color: '#e74c3c', message: 'This range is associated with increased health risks. Consult with healthcare professionals about weight management options.' }
+                ],
+                female: [
+                    { max: 13, name: 'Essential Fat', color: '#3498db', message: 'This is the minimum level of fat needed for basic physiological functions.' },
+                    { max: 20, name: 'Athletic', color: '#2ecc71', message: 'This level is typically seen in athletes and those who maintain intense physical training regimens.' },
+                    { max: 24, name: 'Fitness', color: '#27ae60', message: 'This range indicates good fitness and is achievable with consistent exercise and proper nutrition.' },
+                    { max: 31, name: 'Average', color: '#f1c40f', message: 'This is the typical range for many women. Moderate regular exercise and a balanced diet can help improve this level.' },
+                    { max: 38, name: 'Overweight', color: '#e67e22', message: 'This range indicates excess fat that may pose health risks. Consider increasing activity and adjusting diet.' },
+                    { max: 100, name: 'Obese', color: '#e74c3c', message: 'This range is associated with increased health risks. Consult with healthcare professionals about weight management options.' }
+                ]
+            };
+            
+            // Get the right categories based on gender
+            const genderCategories = categories[gender];
+            
+            // Find the matching category
+            for (const category of genderCategories) {
+                if (bodyFatPercentage <= category.max) {
+                    return category;
+                }
+            }
+            
+            // Fallback (should not reach here due to the 100 max in the last category)
+            return genderCategories[genderCategories.length - 1];
+        }
+    </script>
+</body>
+</html>
