@@ -3,244 +3,257 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HealthSuite - Health Calculators</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>HealthFit - Health Calculators</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
-            --primary: #6366f1;
-            --secondary: #8b5cf6;
-            --accent: #10b981;
-            --dark: #0f172a;
-            --light: #f8fafc;
-            --gradient: linear-gradient(135deg, var(--primary), var(--secondary));
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --accent: #4895ef;
+            --dark: #2b2d42;
+            --light: #f8f9fa;
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
+            font-family: 'Poppins', sans-serif;
         }
 
         body {
-            background-color: var(--light);
-            color: var(--dark);
-            line-height: 1.6;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
         }
 
-        .container {
-            max-width: 1440px;
-            margin: 0 auto;
-            padding: 0 2rem;
-        }
-
-        /* Navigation */
-        nav {
-            background: rgba(248, 250, 252, 0.95);
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
-            padding: 1rem 0;
-            position: sticky;
+            padding: 1rem 2rem;
+            position: fixed;
+            width: 100%;
             top: 0;
             z-index: 1000;
-            box-shadow: 0 4px 30px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
         }
 
-        .nav-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            font-size: 1.75rem;
+        .navbar h1 {
+            color: var(--dark);
+            font-size: 1.8rem;
             font-weight: 700;
-            background: var(--gradient);
+            background: linear-gradient(to right, var(--primary), var(--secondary));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
-        /* Calculators Grid */
-        .calculators-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2.5rem;
-            padding: 4rem 0;
-        }
-
-        .calculator-card {
-            background: white;
-            padding: 2.5rem;
-            border-radius: 20px;
+        .hero {
+            margin-top: 80px;
+            padding: 6rem 2rem 4rem;
             text-align: center;
-            transition: transform 0.3s ease;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
             position: relative;
             overflow: hidden;
         }
 
-        .calculator-card::before {
+        .hero::before {
             content: '';
             position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(45deg, transparent, rgba(99, 102, 241, 0.1), transparent);
-            transform: rotate(45deg);
-            animation: holographic 6s linear infinite;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            clip-path: polygon(0 0, 100% 0, 100% 85%, 0 100%);
+            z-index: -1;
         }
 
-        @keyframes holographic {
-            0% { transform: rotate(45deg) translateX(-50%); }
-            100% { transform: rotate(45deg) translateX(50%); }
-        }
-
-        .calculator-icon {
-            width: 80px;
-            height: 80px;
-            background: var(--gradient);
-            border-radius: 16px;
-            margin: 0 auto 1.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.8rem;
+        .hero h2 {
+            font-size: 2.8rem;
             color: white;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
         }
 
-        .calculator-card h3 {
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
+        .hero p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .tools-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            padding: 3rem 2rem;
+            max-width: 1200px;
+            margin: -6rem auto 0;
+            position: relative;
+        }
+
+        .tool-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2.5rem 2rem;
+            text-align: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .tool-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+        }
+
+        .tool-card i {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .tool-card h3 {
             color: var(--dark);
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
         }
 
-        .calculator-card p {
-            color: #64748b;
+        .tool-card p {
+            color: #6c757d;
             margin-bottom: 2rem;
+            font-size: 0.95rem;
+            line-height: 1.6;
         }
 
         .btn {
             display: inline-flex;
             align-items: center;
-            gap: 0.5rem;
             padding: 0.9rem 2rem;
-            background: var(--gradient);
+            background: linear-gradient(to right, var(--primary), var(--secondary));
             color: white;
             text-decoration: none;
-            border-radius: 10px;
+            border-radius: 50px;
             transition: all 0.3s ease;
             font-weight: 500;
+            position: relative;
+            overflow: hidden;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                120deg,
+                transparent,
+                rgba(255, 255, 255, 0.3),
+                transparent
+            );
+            transition: 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
         }
 
         .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(99, 102, 241, 0.3);
+            box-shadow: 0 8px 20px rgba(67, 97, 238, 0.3);
         }
 
-        /* Responsive Design */
+        footer {
+            background: var(--dark);
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 4rem;
+        }
+
         @media (max-width: 768px) {
-            .calculators-grid {
-                grid-template-columns: 1fr;
-                padding: 2rem 0;
+            .hero {
+                padding: 5rem 1.5rem 3rem;
             }
 
-            .calculator-card {
-                padding: 1.5rem;
+            .hero h2 {
+                font-size: 2rem;
+            }
+
+            .tools-container {
+                grid-template-columns: 1fr;
+                padding: 2rem 1rem;
+                margin-top: -4rem;
+            }
+
+            .tool-card {
+                padding: 2rem 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .navbar {
+                padding: 1rem;
+            }
+
+            .hero h2 {
+                font-size: 1.75rem;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
             }
         }
     </style>
 </head>
 <body>
-    <nav>
-        <div class="container">
-            <div class="nav-content">
-                <div class="logo">HealthSuite</div>
-                <div class="nav-links">
-                    <a href="#features" class="btn">Learn More</a>
-                </div>
-            </div>
-        </div>
+    <nav class="navbar">
+        <h1>HealthFit</h1>
     </nav>
 
-    <main class="container">
-        <section class="calculators-grid">
-            <!-- BMI Calculator -->
-            <div class="calculator-card">
-                <div class="calculator-icon">
-                    <i class="fas fa-weight-scale"></i>
-                </div>
+    <section class="hero">
+        <h2>Transform Your Health Journey</h2>
+        <p>Accurate calculations for BMI, Body Fat, Ideal Weight, and Calorie Needs</p>
+    </section>
 
-                <h3>BMI Calculator</h3>
-                <p>Calculate your Body Mass Index and understand your weight category</p>
-                <a href="/bmi-calculator/bmi calculator.html" class="btn">
-                    <i class="fas fa-calculator"></i>
-                    Calculate Now
-                </a>
-            </div>
+    <div class="tools-container">
+        <div class="tool-card">
+            <i class="fas fa-calculator"></i>
+            <h3>BMI Calculator</h3>
+            <p>Discover your body mass index and understand your weight category based on WHO standards</p>
+            <a href="#" class="btn">Get Started</a>
+        </div>
 
-            <!-- Body Fat Calculator -->
-            <div class="calculator-card">
-                <div class="calculator-icon">
-                    <i class="fas fa-percentage"></i>
-                </div>
-                <h3>Body Fat Percentage</h3>
-                <p>Estimate body composition using multiple calculation methods</p>
-                <a href="/bmi-calculator/Body Fat Percentage Calculator.html" class="btn">
-                    <i class="fas fa-chart-pie"></i>
-                    Analyze Now
-                </a>
-            </div>
+        <div class="tool-card">
+            <i class="fas fa-chart-pie"></i>
+            <h3>Body Fat %</h3>
+            <p>Advanced body fat estimation using U.S. Navy method with precise measurements</p>
+            <a href="#" class="btn">Analyze Now</a>
+        </div>
 
-            <!-- Ideal Weight Calculator -->
-            <div class="calculator-card">
-                <div class="calculator-icon">
-                    <i class="fas fa-person-running"></i>
-                </div>
-                <h3>Ideal Weight</h3>
-                <p>Discover your healthy weight range based on body metrics</p>
-                <a href="/bmi-calculator/Ideal Weight Calculator.html" class="btn">
-                    <i class="fas fa-bullseye"></i>
-                    Find Target
-                </a>
-            </div>
+        <div class="tool-card">
+            <i class="fas fa-weight-hanging"></i>
+            <h3>Ideal Weight</h3>
+            <p>Personalized healthy weight range calculation using multiple formulas</p>
+            <a href="#" class="btn">Calculate</a>
+        </div>
 
-            <!-- Calorie Calculator -->
-            <div class="calculator-card">
-                <div class="calculator-icon">
-                    <i class="fas fa-fire-flame-curved"></i>
-                </div>
-                <h3>Calorie Needs</h3>
-                <p>Calculate daily calorie requirements for your goals</p>
-                <a href="/bmi-calculator/Daily Calorie Needs Calculator.html" class="btn">
-                    <i class="fas fa-bolt"></i>
-                    Calculate Now
-                </a>
-            </div>
-        </section>
-    </main>
+        <div class="tool-card">
+            <i class="fas fa-burn"></i>
+            <h3>Calorie Needs</h3>
+            <p>TDEE calculator with activity level adjustment and goal-oriented recommendations</p>
+            <a href="#" class="btn">Estimate Now</a>
+        </div>
+    </div>
 
-    <script>
-        // Basic interactive animations
-        document.querySelectorAll('.calculator-card').forEach(card => {
-            card.addEventListener('mousemove', (e) => {
-                const rect = card.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                card.style.transform = `
-                    perspective(1000px)
-                    rotateX(${(y - rect.height/2)/15}deg)
-                    rotateY(${-(x - rect.width/2)/15}deg)
-                `;
-            });
-
-            card.addEventListener('mouseleave', () => {
-                card.style.transform = 'none';
-            });
-        });
-    </script>
+    <footer>
+        <p>&copy; 2023 HealthFit. Empowering your health decisions</p>
+    </footer>
 </body>
 </html>
