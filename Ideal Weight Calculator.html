@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ideal Weight Calculator</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+        }
+        .card {
+            border-radius: 16px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        .form-control:focus {
+            border-color: #60a5fa;
+            box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2);
+            outline: none;
+        }
+        .btn-calculate {
+            background-color: #60a5fa;
+            color: white;
+            font-weight: 600;
+            padding: 0.75rem 2rem;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        .btn-calculate:hover {
+            background-color: #3b82f6;
+            transform: translateY(-2px);
+        }
+        .results-card {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .progress-container {
+            width: 100%;
+            height: 20px;
+            background-color: #edf2f7;
+            border-radius: 10px;
+            margin: 8px 0;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 1s ease-in-out;
+        }
+        .ad-container {
+            background-color: #f1f5f9;
+            border: 1px dashed #cbd5e1;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .gender-toggle label {
+            cursor: pointer;
+        }
+        .gender-toggle input[type="radio"] {
+            display: none;
+        }
+        .gender-option {
+            padding: 12px 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        .gender-option i {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        input[type="radio"]:checked + .gender-option {
+            border-color: #60a5fa;
+            background-color: rgba(96, 165, 250, 0.1);
+            color: #60a5fa;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <header class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-blue-600">Ideal Weight Calculator</h1>
+            <p class="text-gray-600 mt-2">Calculate your ideal weight based on height, gender, age, and frame size</p>
+        </header>
+
+        <!-- Ad Container - Top -->
+        <div class="ad-container">
+            <div class="text-gray-500">
+                <!-- Google AdSense Ad Unit -->
+                <p class="text-sm">ADVERTISEMENT</p>
+                <p><!-- Insert Google AdSense ad code here --></p>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="card bg-white p-6 md:p-8">
+            <form id="idealWeightForm" class="calculator-form">
+                <!-- Gender Selection -->
+                <div class="input-group">
+                    <label class="text-lg text-gray-700">Gender</label>
+                    <div class="gender-toggle grid grid-cols-2 gap-4">
+                        <div>
+                            <input type="radio" id="male" name="gender" value="male" checked>
+                            <label for="male" class="gender-option flex flex-col items-center">
+                                <i class="fas fa-mars text-blue-500"></i>
+                                <span>Male</span>
+                            </label>
+                        </div>
+                        <div>
+                            <input type="radio" id="female" name="gender" value="female">
+                            <label for="female" class="gender-option flex flex-col items-center">
+                                <i class="fas fa-venus text-pink-500"></i>
+                                <span>Female</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Age Input -->
+                <div class="input-group">
+                    <label for="age" class="text-lg text-gray-700">Age (years)</label>
+                    <input type="number" id="age" class="form-control" min="18" max="120" value="30" required>
+                </div>
+
+                <!-- Height Input -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="input-group">
+                        <label for="height-feet" class="text-lg text-gray-700">Height (feet)</label>
+                        <input type="number" id="height-feet" class="form-control" min="4" max="7" value="5" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="height-inches" class="text-lg text-gray-700">Height (inches)</label>
+                        <input type="number" id="height-inches" class="form-control" min="0" max="11" value="10" required>
+                    </div>
+                </div>
+
+                <!-- Current Weight Input -->
+                <div class="input-group">
+                    <label for="current-weight" class="text-lg text-gray-700">Current Weight (lbs)</label>
+                    <input type="number" id="current-weight" class="form-control" min="50" max="500" value="160" required>
+                </div>
+
+                <!-- Frame Size -->
+                <div class="input-group">
+                    <label class="text-lg text-gray-700">Frame Size</label>
+                    <div class="grid grid-cols-3 gap-2">
+                        <div class="flex items-center">
+                            <input type="radio" id="small-frame" name="frame-size" value="small" class="mr-2">
+                            <label for="small-frame">Small</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="radio" id="medium-frame" name="frame-size" value="medium" checked class="mr-2">
+                            <label for="medium-frame">Medium</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="radio" id="large-frame" name="frame-size" value="large" class="mr-2">
+                            <label for="large-frame">Large</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Calculate Button -->
+                <div class="mt-6">
+                    <button type="button" id="calculate-btn" class="btn-calculate w-full">Calculate Ideal Weight</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Results Section (initially hidden) -->
+        <div id="results-section" class="results-card card bg-white p-6 md:p-8 mt-6">
+            <h2 class="text-2xl font-bold text-blue-600 mb-4">Your Ideal Weight Results</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <div class="mb-6">
+                        <h3 class="text-lg font-semibold">Your Current Weight</h3>
+                        <p id="current-weight-display" class="text-2xl font-bold text-gray-800">160 lbs</p>
+                    </div>
+
+                    <div class="mb-6">
+                        <h3 class="text-lg font-semibold">Comparison to Ideal</h3>
+                        <div class="flex items-center justify-between">
+                            <span>Current</span>
+                            <span id="weight-difference" class="font-bold text-orange-500">0 lbs</span>
+                            <span>Ideal</span>
+                        </div>
+                        <div class="progress-container">
+                            <div id="weight-progress" class="progress-bar bg-blue-500" style="width: 50%"></div>
+                        </div>
+                        <p id="weight-status" class="text-center mt-2 font-medium">Within ideal range</p>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="text-lg font-semibold mb-2">Ideal Weight Ranges</h3>
+                    <div class="mb-4">
+                        <div class="flex justify-between">
+                            <p>Devine Formula:</p>
+                            <p id="devine-result" class="font-bold">150-165 lbs</p>
+                        </div>
+                        <div class="progress-container">
+                            <div id="devine-bar" class="progress-bar bg-green-500" style="width: 60%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <div class="flex justify-between">
+                            <p>Robinson Formula:</p>
+                            <p id="robinson-result" class="font-bold">148-163 lbs</p>
+                        </div>
+                        <div class="progress-container">
+                            <div id="robinson-bar" class="progress-bar bg-purple-500" style="width: 60%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <div class="flex justify-between">
+                            <p>Miller Formula:</p>
+                            <p id="miller-result" class="font-bold">146-161 lbs</p>
+                        </div>
+                        <div class="progress-container">
+                            <div id="miller-bar" class="progress-bar bg-yellow-500" style="width: 60%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-6 p-4 bg-blue-50 rounded-lg">
+                <h3 class="text-lg font-semibold mb-2 text-blue-700">Understanding Your Results</h3>
+                <p class="text-gray-700">The ideal weight formulas provide ranges based on your height and gender. Frame size adjustments account for body structure variations. Remember that ideal weight is just one health indicator - muscle mass, body composition, and overall health are also important factors to consider.</p>
+            </div>
+        </div>
+
+        <!-- Ad Container - Middle -->
+        <div class="ad-container">
+            <div class="text-gray-500">
+                <!-- Google AdSense Ad Unit -->
+                <p class="text-sm">ADVERTISEMENT</p>
+                <p><!-- Insert Google AdSense ad code here --></p>
+            </div>
+        </div>
+
+        <!-- Health Tips Section -->
+        <div class="card bg-white p-6 md:p-8 mt-6">
+            <h2 class="text-2xl font-bold text-blue-600 mb-4">Healthy Weight Tips</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="flex items-start">
+                    <div class="bg-blue-100 p-3 rounded-full mr-4">
+                        <i class="fas fa-apple-alt text-blue-600 text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold mb-1">Balanced Diet</h3>
+                        <p class="text-gray-600">Focus on whole foods, plenty of fruits and vegetables, lean proteins, and whole grains. Limit processed foods, added sugars, and saturated fats.</p>
+                    </div>
+                </div>
+
+                <div class="flex items-start">
+                    <div class="bg-green-100 p-3 rounded-full mr-4">
+                        <i class="fas fa-running text-green-600 text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold mb-1">Regular Exercise</h3>
+                        <p class="text-gray-600">Aim for at least 150 minutes of moderate activity or 75 minutes of vigorous activity per week, plus strength training twice weekly.</p>
+                    </div>
+                </div>
+
+                <div class="flex items-start">
+                    <div class="bg-purple-100 p-3 rounded-full mr-4">
+                        <i class="fas fa-bed text-purple-600 text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold mb-1">Quality Sleep</h3>
+                        <p class="text-gray-600">Prioritize 7-9 hours of quality sleep nightly. Poor sleep can affect weight management hormones and increase hunger.</p>
+                    </div>
+                </div>
+
+                <div class="flex items-start">
+                    <div class="bg-yellow-100 p-3 rounded-full mr-4">
+                        <i class="fas fa-tint text-yellow-600 text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold mb-1">Stay Hydrated</h3>
+                        <p class="text-gray-600">Drink plenty of water throughout the day. Sometimes thirst can be mistaken for hunger.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ad Container - Bottom -->
+        <div class="ad-container">
+            <div class="text-gray-500">
+                <!-- Google AdSense Ad Unit -->
+                <p class="text-sm">ADVERTISEMENT</p>
+                <p><!-- Insert Google AdSense ad code here --></p>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="mt-8 text-center text-gray-600">
+            <p class="mb-2">This calculator provides estimates based on standard formulas and should not replace medical advice.</p>
+            <p>© 2023 Ideal Weight Calculator | All Rights Reserved</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const calculateBtn = document.getElementById('calculate-btn');
+            calculateBtn.addEventListener('click', calculateIdealWeight);
+
+            // Set default values
+            document.getElementById('current-weight-display').textContent = document.getElementById('current-weight').value + ' lbs';
+        });
+
+        function calculateIdealWeight() {
+            // Get input values
+            const gender = document.querySelector('input[name="gender"]:checked').value;
+            const age = parseInt(document.getElementById('age').value);
+            const feet = parseInt(document.getElementById('height-feet').value);
+            const inches = parseInt(document.getElementById('height-inches').value);
+            const currentWeight = parseInt(document.getElementById('current-weight').value);
+            const frameSize = document.querySelector('input[name="frame-size"]:checked').value;
+
+            // Convert height to inches
+            const heightInches = (feet * 12) + inches;
+
+            // Calculate ideal weight using different formulas
+            const idealWeights = calculateFormulas(gender, heightInches, frameSize);
+
+            // Update the results
+            document.getElementById('current-weight-display').textContent = currentWeight + ' lbs';
+            
+            // Calculate average ideal weight from all formulas
+            const avgIdealWeight = (idealWeights.devine.base + idealWeights.robinson.base + idealWeights.miller.base) / 3;
+            
+            // Calculate difference from ideal
+            const weightDiff = currentWeight - avgIdealWeight;
+            const weightDiffAbs = Math.abs(weightDiff).toFixed(1);
+            
+            // Update difference display
+            const weightDiffElement = document.getElementById('weight-difference');
+            
+            if (Math.abs(weightDiff) < 5) {
+                weightDiffElement.textContent = 'Ideal Range';
+                weightDiffElement.className = 'font-bold text-green-500';
+                document.getElementById('weight-status').textContent = 'Within ideal weight range';
+                document.getElementById('weight-status').className = 'text-center mt-2 font-medium text-green-600';
+            } else if (weightDiff > 0) {
+                weightDiffElement.textContent = weightDiffAbs + ' lbs over';
+                weightDiffElement.className = 'font-bold text-orange-500';
+                document.getElementById('weight-status').textContent = 'Above ideal weight range';
+                document.getElementById('weight-status').className = 'text-center mt-2 font-medium text-orange-600';
+            } else {
+                weightDiffElement.textContent = weightDiffAbs + ' lbs under';
+                weightDiffElement.className = 'font-bold text-blue-500';
+                document.getElementById('weight-status').textContent = 'Below ideal weight range';
+                document.getElementById('weight-status').className = 'text-center mt-2 font-medium text-blue-600';
+            }
+
+            // Update progress bar
+            const maxWeight = Math.max(currentWeight, avgIdealWeight * 1.5);
+            const idealPercent = (avgIdealWeight / maxWeight) * 100;
+            const currentPercent = (currentWeight / maxWeight) * 100;
+            
+            document.getElementById('weight-progress').style.width = currentPercent + '%';
+            if (currentPercent > idealPercent + 10) {
+                document.getElementById('weight-progress').className = 'progress-bar bg-orange-500';
+            } else if (currentPercent < idealPercent - 10) {
+                document.getElementById('weight-progress').className = 'progress-bar bg-blue-500';
+            } else {
+                document.getElementById('weight-progress').className = 'progress-bar bg-green-500';
+            }
+
+            // Update formula results
+            document.getElementById('devine-result').textContent = `${idealWeights.devine.min} - ${idealWeights.devine.max} lbs`;
+            document.getElementById('robinson-result').textContent = `${idealWeights.robinson.min} - ${idealWeights.robinson.max} lbs`;
+            document.getElementById('miller-result').textContent = `${idealWeights.miller.min} - ${idealWeights.miller.max} lbs`;
+
+            // Update formula progress bars
+            updateFormulaBar('devine-bar', currentWeight, idealWeights.devine.min, idealWeights.devine.max);
+            updateFormulaBar('robinson-bar', currentWeight, idealWeights.robinson.min, idealWeights.robinson.max);
+            updateFormulaBar('miller-bar', currentWeight, idealWeights.miller.min, idealWeights.miller.max);
+
+            // Show results section
+            document.getElementById('results-section').style.display = 'block';
+            
+            // Smooth scroll to results
+            document.getElementById('results-section').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function calculateFormulas(gender, heightInches, frameSize) {
+            let devineBase, robinsonBase, millerBase;
+            
+            if (gender === 'male') {
+                // Male formulas
+                devineBase = 50 + 2.3 * (heightInches - 60);
+                robinsonBase = 52 + 1.9 * (heightInches - 60);
+                millerBase = 56.2 + 1.41 * (heightInches - 60);
+            } else {
+                // Female formulas
+                devineBase = 45.5 + 2.3 * (heightInches - 60);
+                robinsonBase = 49 + 1.7 * (heightInches - 60);
+                millerBase = 53.1 + 1.36 * (heightInches - 60);
+            }
+
+            // Frame size adjustments
+            let devineMin, devineMax, robinsonMin, robinsonMax, millerMin, millerMax;
+
+            if (frameSize === 'small') {
+                devineMin = Math.round(devineBase * 0.9);
+                devineMax = Math.round(devineBase * 0.97);
+                robinsonMin = Math.round(robinsonBase * 0.9);
+                robinsonMax = Math.round(robinsonBase * 0.97);
+                millerMin = Math.round(millerBase * 0.9);
+                millerMax = Math.round(millerBase * 0.97);
+            } else if (frameSize === 'medium') {
+                devineMin = Math.round(devineBase * 0.95);
+                devineMax = Math.round(devineBase * 1.05);
+                robinsonMin = Math.round(robinsonBase * 0.95);
+                robinsonMax = Math.round(robinsonBase * 1.05);
+                millerMin = Math.round(millerBase * 0.95);
+                millerMax = Math.round(millerBase * 1.05);
+            } else { // large
+                devineMin = Math.round(devineBase * 1.03);
+                devineMax = Math.round(devineBase * 1.1);
+                robinsonMin = Math.round(robinsonBase * 1.03);
+                robinsonMax = Math.round(robinsonBase * 1.1);
+                millerMin = Math.round(millerBase * 1.03);
+                millerMax = Math.round(millerBase * 1.1);
+            }
+
+            return {
+                devine: {
+                    base: devineBase,
+                    min: devineMin,
+                    max: devineMax
+                },
+                robinson: {
+                    base: robinsonBase,
+                    min: robinsonMin,
+                    max: robinsonMax
+                },
+                miller: {
+                    base: millerBase,
+                    min: millerMin,
+                    max: millerMax
+                }
+            };
+        }
+
+        function updateFormulaBar(barId, currentWeight, minWeight, maxWeight) {
+            const bar = document.getElementById(barId);
+            
+            if (currentWeight < minWeight) {
+                // Underweight
+                const percent = (currentWeight / minWeight) * 80;
+                bar.style.width = percent + '%';
+                bar.className = 'progress-bar bg-blue-500';
+            } else if (currentWeight > maxWeight) {
+                // Overweight
+                const range = maxWeight - minWeight;
+                const overPercent = ((currentWeight - minWeight) / (range * 2)) * 100;
+                const cappedPercent = Math.min(overPercent, 100);
+                bar.style.width = cappedPercent + '%';
+                bar.className = 'progress-bar bg-orange-500';
+            } else {
+                // Within range
+                const range = maxWeight - minWeight;
+                const percent = ((currentWeight - minWeight) / range) * 100;
+                const adjustedPercent = 80 + (percent / 5);
+                bar.style.width = adjustedPercent + '%';
+                bar.className = 'progress-bar bg-green-500';
+            }
+        }
+    </script>
+</body>
+</html>
