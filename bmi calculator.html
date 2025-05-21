@@ -512,5 +512,66 @@
         //     data-full-width-responsive="true"></ins>
         // <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
     </script>
+
+<!-- Add to head section -->
+<meta name="google-adsense-account" content="ca-app-pub-3940256099942544">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-app-pub-3940256099942544" crossorigin="anonymous"></script>
+
+<!-- In body section - replace top ad container -->
+<div class="ad-container h-16 rounded">
+    <ins class="adsbygoogle"
+        style="display:inline-block;width:728px;height:90px"
+        data-ad-client="ca-app-pub-3940256099942544"
+        data-ad-slot="9214589741"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+</div>
+
+<!-- Replace bottom ad container -->
+<div class="ad-container h-24 rounded mt-8">
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-format="autorelaxed"
+        data-ad-client="ca-app-pub-3940256099942544"
+        data-ad-slot="1033173712"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+</div>
+
+<!-- Add this JavaScript code -->
+<script>
+    // Interstitial ad handling
+    let interstitialAd = null;
+
+    function loadInterstitial() {
+        interstitialAd = new google.mobileads.InterstitialAd();
+        interstitialAd.adUnitId = 'ca-app-pub-3940256099942544/1033173712';
+        interstitialAd.load();
+    }
+
+    function showInterstitial() {
+        if (interstitialAd && interstitialAd.isLoaded()) {
+            interstitialAd.show();
+            loadInterstitial(); // Reload for next use
+        }
+    }
+
+    // Initialize ads on page load
+    document.addEventListener('DOMContentLoaded', () => {
+        loadInterstitial();
+        // Load banner ads
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    });
+
+    // Modify calculate function
+    function calculateBMI() {
+        // Existing BMI calculation code
+        
+        // Show interstitial ad after calculation
+        showInterstitial();
+    }
+</script>
 </body>
 </html>
